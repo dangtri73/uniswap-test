@@ -16,4 +16,12 @@ const deploy = async () => {
         .send({gas: '1000000', from: accounts[0]});
     console.log('Contract deploy to', result.options.address);
 };
+const test = async () => {
+    const walletAddress =
+    // "0x1cf56Fd8e1567f8d663e54050d7e44643aF970Ce"; //test
+    "0xFA3fBD05380E998C432515b299cf0157bE9C0c21"; //Metamask
+    const inputReserve = await web3.eth.getBalance(walletAddress);
+    console.log(inputReserve);
+}
 deploy();
+// test();
