@@ -1,63 +1,67 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const Web3 = require('web3');
 const { interface, bytecode } = require('./compile');
-const { ChainId, Token, TokenAmount, Pair } = require('@uniswap/sdk')
+const {pairAbi} = require('./build/pair.json');
+const {factoryAbi} = require('./build/factory.json')
+const {pairq} = require('./build/wethToUsdt.json')
 
-// const providerr = "https://mainnet.infura.io/v3/60987efd72db4f10b52ab0c8545ab9bb";
-// const Web3Client = new Web3(new Web3.providers.HttpProvider(providerr));
+//Link to Mainnet
+const providerr = "https://mainnet.infura.io/v3/60987efd72db4f10b52ab0c8545ab9bb";
+const Web3Client = new Web3(new Web3.providers.HttpProvider(providerr));
 
-const provider = new HDWalletProvider(
-    'pear upper coffee winter language silent become curious frame finish question regular',
-    'https://mainnet.infura.io/v3/60987efd72db4f10b52ab0c8545ab9bb'
-);
+// Pair Address
+const wethToUsdt = "0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852";
+const usdtToWbtc = "0x0DE0Fa91b6DbaB8c8503aAA2D1DFa91a192cB149";
+const wbtcToWeth = "0xBb2b8038a1640196FbE3e38816F3e67Cba72D940";
 
-const walletAddressRink = "0xFA3fBD05380E998C432515b299cf0157bE9C0c21";
+// Reserve Data
+let pairWethUsdt;
+let pairUsdtWbtc;
+let pairWbtcWeth;
 
-const walletAddressMain = "0x1cf56Fd8e1567f8d663e54050d7e44643aF970Ce";
+// Get Reserve from ABI
+const getReserves = async (abi, pairAddress) => {
+    const result = await new Web3Client.eth.Contract(abi, pairAddress)
+    const reserves = await result.methods.getReserves().call()
+    // console.log(reserves);
+    return reserves;
+}
+const getAllReserves = async () => {
+    pairWethUsdt = await getReserves(pairAbi, wethToUsdt);
+    pairUsdtWbtc = await getReserves(pairAbi, usdtToWbtc);
+    pairWbtcWeth = await getReserves(pairAbi, wbtcToWeth);
+};
 
-const wethAddressRink = "0xdf032bc4b9dc2782bb09352007d4c57b75160b15";
-const usdtAddressRink = "0x01547ef97f9140dbdf5ae50f06b77337b95cf4bb";
-const wbtcAddressRink = "0x5af59f281b3cfd0c12770e4633e6c16dd08ea543";
-
-const wethAddressMain = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-const usdtAddressMain = "0xdac17f958d2ee523a2206206994597c13d831ec7";
-const wbtcAddressMain = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599";
-
-const minABI = [
-    {
-        constant: true,
-        inputs: [{ name: "_owner", type: "address" }],
-        name: "balanceOf",
-        outputs: [{ name: "balance", type: "uint256" }],
-        type: "function",
-    },
-];
-const web3 = new Web3(provider);
-
-const getReserveETH = async () => {
-    const reserve = await Web3Client.eth.getBalance(walletAddress);
-    return reserve;
+// Calculate Amount Output from Reserves
+const calculateAmoutOutput = async (pair, inputAmout) => {
+    reserve0 = pair.reserve0;
+    console.log(reserve0);
+    reserve1 = pair.reserve1;
+    console.log(reserve1);
+    const outputAmout = (inputAmout*reserve1*0.997)/(reserve0*1+inputAmout*0.997);
+    console.log(outputAmout);
+    return outputAmout;
 }
 
-const getReserve = async (addressToken) => {
-    const contract = await new web3.eth.Contract(minABI, addressToken);
-    const value = await contract.methods.balanceOf(walletAddressMain).call();
-    return value;
+const calculateAmoutOutputt = async (pair, inputAmout) => {
+    reserve0 = pair.reserve1;
+    console.log(reserve0);
+    reserve1 = pair.reserve0;
+    console.log(reserve1);
+    const outputAmout = (inputAmout*reserve1*0.997)/(reserve0*1+inputAmout*0.997);
+    console.log(outputAmout);
+    return outputAmout;
 }
 
-const calculate = async (inputWETH) => {
-    // Calculate WETH -> USDT
-    const wethAmount = inputWETH;
-    const wethReserve = await getReserve(wethAddressMain);
-    const usdtReserve = await getReserve(usdtAddressMain);
-
-    const usdtAmout = (wethAmount * usdtReserve * 997) / (wethReserve * 1000 + wethAmount * 997);
-}
-
-const final = async () => {
-    const a = await contract.methods.getTokenPrice("0x5308a481b2b65f6086083d2268acb73aadc757e0", "1234")
-        .send({ from: "0xFA3fBD05380E998C432515b299cf0157bE9C0c21"});
-    console.log(a);
+// Run program
+const deploy = async () => {
+    await getAllReserves();
+    const InputWETH = 1111111111111;
+    const usdtOutput = await calculateAmoutOutput(pairWethUsdt, InputWETH);
+    const wbtcOutput = await calculateAmoutOutputt(pairUsdtWbtc, usdtOutput);
+    const wethOutput = await calculateAmoutOutput(pairWbtcWeth, wbtcOutput);
+    console.log("Amount WETH Input: ", InputWETH);
+    console.log("Amount WETH Output: ", wethOutput);
 }
 
 deploy();

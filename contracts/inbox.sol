@@ -1,4 +1,5 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.17; 
+// import "https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2Pair.sol";
 
 contract Inbox {
     string public message;
