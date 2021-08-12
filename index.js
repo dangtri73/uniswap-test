@@ -4,6 +4,8 @@ const { interface, bytecode } = require('./compile');
 const {pairAbi} = require('./build/pair.json');
 const {factoryAbi} = require('./build/factory.json')
 const {pairq} = require('./build/wethToUsdt.json')
+const {BigNumber,FixedFormat,FixedNumber,formatFixed,parseFixed} = require("@ethersproject/bignumber");
+const { ethers } = require("ethers");
 
 //Link to Mainnet
 const providerr = "https://mainnet.infura.io/v3/60987efd72db4f10b52ab0c8545ab9bb";
@@ -23,7 +25,6 @@ let pairWbtcWeth;
 const getReserves = async (abi, pairAddress) => {
     const result = await new Web3Client.eth.Contract(abi, pairAddress)
     const reserves = await result.methods.getReserves().call()
-    // console.log(reserves);
     return reserves;
 }
 const getAllReserves = async () => {
@@ -34,34 +35,41 @@ const getAllReserves = async () => {
 
 // Calculate Amount Output from Reserves
 const calculateAmoutOutput = async (pair, inputAmout) => {
-    reserve0 = pair.reserve0;
-    console.log(reserve0);
-    reserve1 = pair.reserve1;
-    console.log(reserve1);
-    const outputAmout = (inputAmout*reserve1*0.997)/(reserve0*1+inputAmout*0.997);
-    console.log(outputAmout);
-    return outputAmout;
+    const reserve0BN = ethers.utils.parseEther(pair.reserve0.toString());
+    const reserve1BN = ethers.utils.parseEther(pair.reserve1.toString());
+    // const outputAmout = (inputAmout*reserve1*0.997)/(reserve0*1+inputAmout*0.997);
+    const inputAmoutBN = inputAmout.mul(ethers.utils.parseEther("997")).div(ethers.utils.parseEther("1000"));
+    const numerator = inputAmoutBN.mul(reserve1BN)
+    const denominator = reserve0BN.add(inputAmoutBN)
+    const outputAmountBN = numerator.div(denominator);
+    console.log(ethers.utils.formatUnits(outputAmountBN));
+    console.log("--------------------");
+    return outputAmountBN;
 }
 
-const calculateAmoutOutputt = async (pair, inputAmout) => {
-    reserve0 = pair.reserve1;
-    console.log(reserve0);
-    reserve1 = pair.reserve0;
-    console.log(reserve1);
-    const outputAmout = (inputAmout*reserve1*0.997)/(reserve0*1+inputAmout*0.997);
-    console.log(outputAmout);
-    return outputAmout;
+const calculateAmoutOutputRevert = async (pair, inputAmout) => {
+    const reserve0BN = ethers.utils.parseEther(pair.reserve1.toString());
+    const reserve1BN = ethers.utils.parseEther(pair.reserve0.toString());
+    // const outputAmout = (inputAmout*reserve1*0.997)/(reserve0*1+inputAmout*0.997);
+    const inputAmoutBN = inputAmout.mul(ethers.utils.parseEther("997")).div(ethers.utils.parseEther("1000"));
+    const numerator = inputAmoutBN.mul(reserve1BN)
+    const denominator = reserve0BN.add(inputAmoutBN)
+    const outputAmountBN = numerator.div(denominator);
+    console.log(ethers.utils.formatUnits(outputAmountBN));
+    console.log("--------------------");
+    return outputAmountBN;
 }
 
 // Run program
 const deploy = async () => {
     await getAllReserves();
-    const InputWETH = 1111111111111;
-    const usdtOutput = await calculateAmoutOutput(pairWethUsdt, InputWETH);
-    const wbtcOutput = await calculateAmoutOutputt(pairUsdtWbtc, usdtOutput);
+    const InputWeth = "1111111111111"; // Need a string to change to BigNumer
+    const InputWethBN = ethers.utils.parseEther(InputWeth);
+    const usdtOutput = await calculateAmoutOutput(pairWethUsdt, InputWethBN);
+    const wbtcOutput = await calculateAmoutOutputRevert(pairUsdtWbtc, usdtOutput);
     const wethOutput = await calculateAmoutOutput(pairWbtcWeth, wbtcOutput);
-    console.log("Amount WETH Input: ", InputWETH);
-    console.log("Amount WETH Output: ", wethOutput);
+    console.log("Amount WETH Input: ", InputWeth);
+    console.log("Amount WETH Output: ", ethers.utils.formatUnits(wethOutput));
 }
 
 deploy();

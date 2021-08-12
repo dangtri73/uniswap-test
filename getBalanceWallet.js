@@ -3,6 +3,21 @@ const Web3 = require('web3');
 const { interface, bytecode } = require('./compile');
 const { ChainId, Token, TokenAmount, Pair } = require('@uniswap/sdk')
 
+const {
+
+    BigNumber,
+
+    FixedFormat,
+    FixedNumber,
+
+    formatFixed,
+
+    parseFixed
+
+    // Types
+
+} = require("@ethersproject/bignumber");
+
 // const providerr = "https://mainnet.infura.io/v3/60987efd72db4f10b52ab0c8545ab9bb";
 // const Web3Client = new Web3(new Web3.providers.HttpProvider(providerr));
 
