@@ -52,11 +52,10 @@ const calculateAmoutOutputt = async (pair, inputAmout) => {
     console.log(outputAmout);
     return outputAmout;
 }
-
-// Run program
+/** Hàm chạy chương trình */
 const deploy = async () => {
     await getAllReserves();
-    const InputWETH = 1111111111111;
+    const InputWETH = 111111;
     const usdtOutput = await calculateAmoutOutput(pairWethUsdt, InputWETH);
     const wbtcOutput = await calculateAmoutOutputt(pairUsdtWbtc, usdtOutput);
     const wethOutput = await calculateAmoutOutput(pairWbtcWeth, wbtcOutput);
