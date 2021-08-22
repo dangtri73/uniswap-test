@@ -1,9 +1,9 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const Web3 = require('web3');
-const { interface, bytecode } = require('./compile');
-const {pairAbi} = require('./build/pair.json');
-const {factoryAbi} = require('./build/factory.json')
-const {pairq} = require('./build/wethToUsdt.json')
+const { interface, bytecode } = require('../compile');
+const {pairAbi} = require('../build/pair.json');
+const {factoryAbi} = require('../build/factory.json')
+const {pairq} = require('../build/wethToUsdt.json')
 
 //Link to Mainnet
 const providerr = "https://mainnet.infura.io/v3/60987efd72db4f10b52ab0c8545ab9bb";

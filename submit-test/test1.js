@@ -63,7 +63,7 @@ const calculateAmountOutputRevert = async (pair, inputAmount) => {
 // Run program
 const deploy = async () => {
     await getAllReserves();
-    const InputWeth = "1111111111111"; // Need a string to change to BigNumber
+    const InputWeth = "111111"; // Need a string to change to BigNumber
     const InputWethBN = ethers.utils.parseEther(InputWeth);
     const usdtOutput = await calculateAmountOutput(pairWethUsdt, InputWethBN);
     const wbtcOutput = await calculateAmountOutputRevert(pairUsdtWbtc, usdtOutput);

@@ -57,7 +57,7 @@ const calculateAmoutOutput = async (dx) => {
 /** Run program */
 const deploy = async () => {
     await getAllReserves();
-    const InputWETH = 111134;
+    const InputWETH = 111111;
     const OutputWETH = await calculateAmoutOutput(InputWETH);
     console.log("Amount WETH Input: ", InputWETH);
     console.log("Amount WETH Output: ", OutputWETH);
